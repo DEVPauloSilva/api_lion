@@ -1,4 +1,4 @@
-import { Body, Param } from '@nestjs/common';
+import { Body, Get, Logger, Param, Post, Res } from '@nestjs/common';
 import { PedidoCreateDecorator } from './dedcorators/pedido-create';
 import { PedidoDecorator } from './dedcorators/pedido-decorator';
 import { PedidoDeleteDecorator } from './dedcorators/pedido-delete';
@@ -12,6 +12,10 @@ import { UpdatePedidoDto } from './dto/update-pedido.dto';
 import { PedidoService } from './pedido.service';
 import { Pedido } from './schemas/pedido.schema';
 import { PedidosUpdateDecorator } from './dedcorators/pedidos-put';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { Usuario } from '@prisma/client';
+import { Response, Request } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @PedidoDecorator()
 export class PedidoController {
@@ -77,5 +81,16 @@ export class PedidoController {
       id,
       pedidoAtualizado,
     );
+  }
+
+  @Post('gerarPDf/:compraId')
+  async geraPdf(@Param('compra_id') compra_id: string, @Res() res: Response, @CurrentUser() user: Usuario){
+    const file_stream = await this.pedidoService.gerarPedidoPdf(compra_id, user.empresa_id);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=compra_cliente.pdf");
+
+    // Retorna o PDF para o cliente
+    //res.send(Buffer.from(file_stream));
   }
 }

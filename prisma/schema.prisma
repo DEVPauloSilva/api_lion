@@ -14,8 +14,11 @@ model Empresa {
   name        String
   contato     String
   endereco    String
+  tipo        String        // "locadora", "ferragista", "ambos"
   usuario     Usuario[]
   vendaDiaria caixaDiario[]
+  veiculos    Veiculos[]
+  clientes       Clientes[]
 }
 
 model Usuario {
@@ -24,9 +27,6 @@ model Usuario {
   password       String
   name           String
   empresa_id     String
-  clientes       Clientes[]
-  comprasCliente Compra[]
-  itensCompra    ItemCompra[]
   produtos       Produtos[]
   empresa        Empresa       @relation(fields: [empresa_id], references: [empresa_id])
   vendaDiaria    caixaDiario[]
@@ -57,7 +57,6 @@ model Produtos {
   marca        String?
   status       String
   usuario_id   String
-  ItensCompra  ItemCompra[]
   usuario      Usuario      @relation(fields: [usuario_id], references: [usuario_id])
 }
 
@@ -67,33 +66,34 @@ model Clientes {
   cpf        String?
   telefone   String?
   endereco   String?
-  usuario_id String
-  user       Usuario  @relation(fields: [usuario_id], references: [usuario_id])
-  Compras    Compra[]
+  empresa_id String
+  blacklist           Boolean  @default(false)  // Indica se o cliente está na blacklist
+  instituicao_negativado String?
+  empresa       Empresa  @relation(fields: [empresa_id], references: [empresa_id])
+  aluguel    Aluguel[]
+}
+model Veiculos {
+  veiculo_id    String  @id @default(uuid())
+  modelo        String
+  marca         String
+  placa         String  @unique
+  ano           Int
+  status        String  // Disponível, Alugado, Manutenção
+  empresa_id    String
+  empresa       Empresa @relation(fields: [empresa_id], references: [empresa_id])
+  alugueis      Aluguel[]
 }
 
-model Compra {
-  id         String       @id @default(uuid())
-  cliente_id String
-  dataCompra DateTime     @default(now())
-  total      Float
-  valorPago  Float        @default(0)
-  usuario_id String
-  cliente    Clientes     @relation(fields: [cliente_id], references: [cliente_id])
-  user       Usuario      @relation(fields: [usuario_id], references: [usuario_id])
-  itens      ItemCompra[]
+model Aluguel {
+  aluguel_id    String   @id @default(uuid())
+  cliente_id    String
+  veiculo_id    String
+  dataInicio    DateTime
+  dataFim       DateTime?
+  valorTotal    Float
+  status        String   // Ativo, Finalizado, Cancelado
+  cliente       Clientes @relation(fields: [cliente_id], references: [cliente_id])
+  veiculo       Veiculos @relation(fields: [veiculo_id], references: [veiculo_id])
 }
 
-model ItemCompra {
-  id              String   @id @default(uuid())
-  compraId        String
-  produto_id      String
-  quantidade      Int
-  precoUnitario   Float
-  precoTotal      Float    @default(0)
-  requisitor_nome String
-  usuario_id      String
-  compra          Compra   @relation(fields: [compraId], references: [id])
-  produto         Produtos @relation(fields: [produto_id], references: [produto_id])
-  user            Usuario  @relation(fields: [usuario_id], references: [usuario_id])
-}
+

@@ -34,10 +34,20 @@ export const ClienteCreateDecorator = () => {
             description: 'Endereço completo do cliente, incluindo rua, número e bairro.',
             example: 'Rua 00, Número 123, Bairro Centro',
           },
-          usuario_id: {
+          empresa_id: {
             type: 'string',
             description: 'ID do usuário que está criando o cliente. Este campo é obrigatório.',
             example: 'Abc123',
+          },
+          blacklist: {
+            type: 'boolean',
+            description: 'Indica se o cliente está na blacklist. Este campo é opcional.',
+            example: false,
+          },
+          instituicao_negativado: {
+            type: 'string',
+            description: 'Nome da instituição onde o cliente está negativado, se houver. Este campo é opcional.',
+            example: 'Banco XYZ',
           },
         },
       },

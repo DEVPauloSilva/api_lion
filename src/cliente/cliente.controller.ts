@@ -21,7 +21,7 @@ export class ClienteController {
       );
 
       // Validação extra se necessário
-      if (!cliente.nome || !cliente.usuario_id) {
+      if (!cliente.nome || !cliente.empresa_id) {
         this.logger.warn('Dados inválidos fornecidos para criação do cliente');
         throw new HttpException(
           'Nome e ID do usuário são obrigatórios.',

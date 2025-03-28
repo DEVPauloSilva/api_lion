@@ -1,0 +1,170 @@
+model EpUser {
+  id_user        Int      @id @default(autoincrement()) @map("id_user")
+  name           String   @map("name")
+  user_type      String   @map("user_type")
+  email          String   @unique @map("email")
+  phone_number   String   @map("phone_number")
+  user_status    String   @map("user_status")
+  registration_date DateTime @map("registration_date") @default(now())
+  financier     EpFinancier[]
+}
+
+
+model EpCedent {
+  id                Int      @id @default(autoincrement()) @map("id")
+  cnpj              String   @unique @map("cnpj")
+  corporate_name    String   @map("corporate_name")
+  trade_name        String   @map("trade_name")
+  cnae              String   @map("cnae")
+  cnae_description  String   @map("cnae_description")
+  company_type      String   @map("company_type")
+  tax_regime        String   @map("tax_regime")
+  email             String   @map("email")
+  phone             String   @map("phone")
+  website           String   @map("website")
+  annual_revenue    Float    @map("annual_revenue")
+  advance_limit     Float    @map("advance_limit")
+  utilized_limit    Float    @map("utilized_limit")
+  rating            String   @map("rating")
+  status            String   @map("status")
+  cedenteAdress     EpCedentAddress[]
+  cedentPartner     EpCedentPartner[]
+}
+
+model EpCedentAddress {
+  id          Int      @id @default(autoincrement()) @map("id")
+  cedent_id   Int      @map("cedent_id")
+  type        String   @map("type")
+  zip_code    String   @map("zip_code")
+  street      String   @map("street")
+  number      String   @map("number")
+  complement  String?  @map("complement")
+  neighborhood String  @map("neighborhood")
+  city        String   @map("city")
+  state       String   @map("state")
+
+  cedent      EpCedent @relation(fields: [cedent_id], references: [id]) // Relacionamento com a tabela EpCedent
+}
+
+model EpCedentPartner {
+  id                    Int      @id @default(autoincrement()) @map("id")
+  cedent_id             Int      @map("cedent_id")
+  name                  String   @map("name")
+  birth_date            DateTime @map("birth_date")
+  marital_status        String   @map("marital_status")
+  cpf                   String   @unique @map("cpf")
+  rg                    String   @map("rg")
+  issuing_agency        String   @map("issuing_agency")
+  rg_state              String   @map("rg_state")
+  company_participation Float    @map("company_participation")
+  signs_for_company     Boolean  @map("signs_for_company")
+  email                 String   @map("email")
+  phone                 String   @map("phone")
+  mobile                String   @map("mobile")
+  zip_code              String   @map("zip_code")
+  street                String   @map("street")
+  number                String   @map("number")
+  complement            String?  @map("complement")
+  neighborhood          String   @map("neighborhood")
+  city                  String   @map("city")
+  state                 String   @map("state")
+
+  cedent                EpCedent @relation(fields: [cedent_id], references: [id]) // Relacionamento com a tabela EpCedent
+}
+
+model EpFinancier {
+  id_financier       Int      @id @default(autoincrement()) @map("id_financier")
+  id_user            Int      @map("id_user")
+  cnpj               String   @unique @map("cnpj")
+  available_capital  Float    @map("available_capital")
+  direct_payment     Boolean  @map("direct_payment")
+  address_street     String   @map("address_street")
+  address_number     String   @map("address_number")
+  address_complement String?  @map("address_complement")
+  address_neighborhood String @map("address_neighborhood")
+  address_city       String   @map("address_city")
+  address_state      String   @map("address_state")
+  address_zip_code   String   @map("address_zip_code")
+  status             String   @map("status")
+  created_date       DateTime @map("created_date")
+  suspended_date     DateTime? @map("suspended_date")
+  financierPartner   EpFinancierPartner[]
+  financierCreditPolicy   EpFinancierCreditPolicy[]
+  financierRestrictedRating  EpFinancierRestrictedRating[]
+  financierRestrictedSector  EpFinancierRestrictedSector[]
+  user               EpUser   @relation(fields: [id_user], references: [id_user]) // Relacionamento com a tabela de usuários
+}
+model EpFinancierPartner {
+  id_partner           Int      @id @default(autoincrement()) @map("id_partner")
+  id_financier         Int      @map("id_financier")
+  cpf                  String   @unique @map("cpf")
+  name                 String   @map("name")
+  ownership_percentage Float    @map("ownership_percentage")
+  address_street       String   @map("address_street")
+  address_number       String   @map("address_number")
+  address_complement   String?  @map("address_complement")
+  address_neighborhood String   @map("address_neighborhood")
+  address_city         String   @map("address_city")
+  address_state        String   @map("address_state")
+  address_zip_code     String   @map("address_zip_code")
+  legal_representative Boolean  @map("legal_representative")
+  created_date         DateTime @map("created_date")
+
+  financier            EpFinancier @relation(fields: [id_financier], references: [id_financier]) // Relacionamento com a tabela EpFinancier
+}
+model EpFinancierCreditPolicy {
+  id_policy           Int      @id @default(autoincrement()) @map("id_policy")
+  id_financier        Int      @map("id_financier")
+  min_limit           Float    @map("min_limit")
+  max_limit           Float    @map("max_limit")
+  max_term_days       Int      @map("max_term_days")
+  accepts_new_assignors Boolean @map("accepts_new_assignors")
+  interestRate    EpInterestRate[]
+
+  financier           EpFinancier @relation(fields: [id_financier], references: [id_financier]) // Relacionamento com a tabela EpFinancier
+}
+model EpInterestRate {
+  id_rate      Int      @id @default(autoincrement()) @map("id_rate")
+  id_policy    Int      @map("id_policy")
+  rating       String   @map("rating")
+  interest_rate Float   @map("interest_rate")
+  financierInterestRateRebate  EpFinancierInterestRateRebate[]
+
+  policy       EpFinancierCreditPolicy @relation(fields: [id_policy], references: [id_policy]) // Relacionamento com a tabela EpFinancierCreditPolicy
+}
+model EpFinancierInterestRateRebate {
+  id_rebate                  Int     @id @default(autoincrement()) @map("id_rebate")
+  id_rate                    Int     @map("id_rate")
+  platform_rebate_percentage Float   @map("platform_rebate_percentage")
+  platform_rebate_fixed      Float   @map("platform_rebate_fixed")
+  assignor_rebate_percentage Float   @map("assignor_rebate_percentage")
+  assignor_rebate_fixed      Float   @map("assignor_rebate_fixed")
+
+  rate EpInterestRate @relation(fields: [id_rate], references: [id_rate]) // Relacionamento com EpInterestRate
+}
+model EpFinancierRestrictedRating {
+  id_restriction_rating Int    @id @default(autoincrement()) @map("id_restriction_rating")
+  id_financier          Int    @map("id_financier")
+  rating                String @map("rating")
+
+  financier             EpFinancier @relation(fields: [id_financier], references: [id_financier]) // Relacionamento com a tabela EpFinancier
+}
+
+model EpFinancierRestrictedSector {
+  id_restriction_sector Int    @id @default(autoincrement()) @map("id_restriction_sector")
+  id_financier          Int    @map("id_financier")
+  sector_cnae           String @map("sector_cnae")
+
+  financier             EpFinancier @relation(fields: [id_financier], references: [id_financier]) // Relacionamento com EpFinancier
+}
+
+model EpBankingDetail {
+  id_banking_detail Int    @id @default(autoincrement()) @map("id_banking_detail")
+  id_company        Int    @map("id_company")
+  user_type         String @map("user_type")
+  numbank           String @map("numbank")
+  agency            String @map("agency")
+  account           String @map("account")
+  account_type      String @map("account_type")
+}
+

@@ -10,11 +10,13 @@ import { PedidoModule } from './pedidos/pedido.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProdutosModule } from './produtos/produtos.module';
 import { UsuarioModule } from './usuario/usuario.module';
+import { VeiculosModule } from 'veiculos/veiculos.module';
+import { AlugueisModule } from 'alugueis/alugueis.module';
 
 @Module({
   imports: [
     PrismaModule,
-    MongooseModule.forRoot(process.env.MONGODB_URL),
+    MongooseModule.forRoot('mongodb+srv://maximuzpaulo:6th0cW8OymQ63D7W@lion.goyj0.mongodb.net/'),//process.env.MONGODB_URL),
     AuthModule,
     UsuarioModule,
     EmpresaModule,
@@ -22,6 +24,8 @@ import { UsuarioModule } from './usuario/usuario.module';
     ProdutosModule,
     ClienteModule,
     PedidoModule,
+    VeiculosModule,
+    AlugueisModule
   ],
   controllers: [],
   providers: [
